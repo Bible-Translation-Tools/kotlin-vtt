@@ -200,14 +200,28 @@ class OutputOptions private constructor(
      * Whether to eventually emit all cues, or only those after [.startTimeUs]. Ignored if
      * [.startTimeUs] is not set.
      */
-    val outputAllCues: Boolean
+    val outputAllCues: Boolean,
+
+    /**
+     * For each cue, include all cues which occur between the start and end timestamp
+     */
+    val groupCuesInRange: Boolean
 ) {
     companion object {
-        private val ALL = OutputOptions(TIME_UNSET,  /* outputAllCues= */false)
+        private val ALL = OutputOptions(TIME_UNSET,  /* outputAllCues= */false, true)
+        private val ALL_UNGROUPED = OutputOptions(TIME_UNSET, false, false)
 
         /** Output all [CuesWithTiming] instances.  */
         fun allCues(): OutputOptions {
             return ALL
+        }
+
+        /**
+         * Output all [CuesWithTiming] instances.
+         * Each cue only contains the cue at the [CuesWithTiming.startTimeUs] and [CuesWithTiming.endTimeUs]
+         */
+        fun allCuesUngrouped(): OutputOptions {
+            return ALL_UNGROUPED
         }
 
         /**
@@ -218,7 +232,7 @@ class OutputOptions private constructor(
          * The order in which [CuesWithTiming] instances are emitted is not defined.
          */
         fun onlyCuesAfter(startTimeUs: Long): OutputOptions {
-            return OutputOptions(startTimeUs,  /* outputAllCues= */false)
+            return OutputOptions(startTimeUs,  /* outputAllCues= */false, true)
         }
 
         /**
@@ -229,7 +243,7 @@ class OutputOptions private constructor(
          * defined.
          */
         fun cuesAfterThenRemainingCuesBefore(startTimeUs: Long): OutputOptions {
-            return OutputOptions(startTimeUs,  /* outputAllCues= */true)
+            return OutputOptions(startTimeUs,  /* outputAllCues= */true, true)
         }
     }
 }

@@ -21,12 +21,15 @@ package org.bibletranslationtools.vtt
 // information around in a sidecar object.
 class Cue private constructor(
     text: CharSequence?,
+    markup: List<CharSequence>? = listOf()
 ) {
     /**
      * The cue text, or null if this is an image cue. Note the [CharSequence] may be decorated
      * with styling spans.
      */
-    var text: CharSequence? = text
+    private var text: CharSequence? = text
+
+    val content: List<CharSequence> = if (markup != null) arrayListOf(*markup.toTypedArray()) else listOf()
 
     class Builder {
         /**
@@ -36,6 +39,8 @@ class Cue private constructor(
          */
         var text: CharSequence?
             private set
+
+        var markup: List<CharSequence> = arrayListOf()
 
         constructor() {
             text = null
@@ -58,9 +63,14 @@ class Cue private constructor(
             return this
         }
 
+        fun addMarkup(markup: CharSequence): Builder {
+            (this.markup as MutableList<CharSequence>).add(markup)
+            return this
+        }
+
         /** Build the cue.  */
         fun build(): Cue {
-            return Cue(text)
+            return Cue(text, markup)
         }
     }
 

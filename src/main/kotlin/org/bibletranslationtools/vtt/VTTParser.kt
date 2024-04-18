@@ -2,6 +2,10 @@ package org.bibletranslationtools.vtt
 
 import org.bibletranslationtools.vtt.WebvttParserUtil.validateWebvttHeaderLine
 import java.io.File
+import java.io.FileInputStream
+import java.io.InputStream
+import java.util.*
+import kotlin.collections.ArrayList
 
 class VTTParser {
 
@@ -16,6 +20,37 @@ class VTTParser {
     private val STYLE_START = "STYLE"
 
     private var parsableWebvttData: ParsableByteArray = ParsableByteArray()
+
+    fun parse(file: File): List<WebvttCueInfo> {
+        file.inputStream().use {
+            val out = parse(it)
+            return out
+        }
+    }
+    fun parse(inputStream: InputStream): List<WebvttCueInfo> {
+        val output = object : Consumer<CuesWithTiming> {
+            val contents: MutableList<CuesWithTiming> = arrayListOf()
+            override fun accept(t: CuesWithTiming) {
+                contents.addLast(t)
+            }
+        }
+        val bytes = inputStream.readAllBytes()
+        parse(
+            bytes,
+            0,
+            bytes.size,
+            OutputOptions.allCuesUngrouped(),
+            output
+        )
+
+        return output.contents
+            .map { WebvttCueInfo(it.cues.first(), it.startTimeUs, it.endTimeUs) }
+            .toTypedArray()
+            .copyOf(output.contents.size).mapNotNull {
+                it
+            }
+            .toList()
+    }
 
     fun parse(
         data: ByteArray,
@@ -47,7 +82,6 @@ class VTTParser {
                 parsableWebvttData.readLine() // Consume the "STYLE" header.
             } else if (event == EVENT_CUE) {
                 val cueInfo: WebvttCueInfo? = VTTCueParser.parseCue(parsableWebvttData)
-                println(parsableWebvttData.getPosition())
                 if (cueInfo != null) {
                     cueInfos.add(cueInfo)
                 }
@@ -55,7 +89,13 @@ class VTTParser {
         }
         val subtitle: WebvttSubtitle = WebvttSubtitle(cueInfos)
 
-        LegacySubtitleUtil.toCuesWithTiming(subtitle, outputOptions, output)
+        if (outputOptions.groupCuesInRange) {
+            LegacySubtitleUtil.toCuesWithTiming(subtitle, outputOptions, output)
+        } else {
+            cueInfos
+                .map { CuesWithTiming(listOf(it.cue), it.startTimeUs, it.endTimeUs) }
+                .forEach { output.accept(it) }
+        }
     }
 
     /**

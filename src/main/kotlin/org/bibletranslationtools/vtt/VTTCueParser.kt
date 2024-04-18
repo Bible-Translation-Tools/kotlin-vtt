@@ -88,6 +88,7 @@ object VTTCueParser {
             line = webvttData.readLine()
         }
         builder.text = parseCueText(id, textBuilder.toString())
+        builder.markup = textBuilder.toString()
         return builder.build()
     }
 
@@ -191,7 +192,7 @@ object VTTCueParser {
         var endTimeUs: Long = 0
 
         var text: CharSequence? = null
-
+        var markup: CharSequence? = null
 
         fun build(): WebvttCueInfo {
             val cue = toCueBuilder().build()
@@ -203,6 +204,10 @@ object VTTCueParser {
 
             if (text != null) {
                 cueBuilder.setText(text)
+            }
+
+            markup?.let{
+                cueBuilder.addMarkup(it)
             }
 
             return cueBuilder
