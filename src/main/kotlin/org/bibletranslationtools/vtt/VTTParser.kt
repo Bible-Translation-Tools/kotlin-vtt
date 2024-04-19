@@ -21,12 +21,13 @@ class VTTParser {
 
     private var parsableWebvttData: ParsableByteArray = ParsableByteArray()
 
-    fun parse(file: File): List<WebvttCueInfo> {
+    fun parse(file: File): List<WebVttCue> {
         file.inputStream().use {
             val out = parse(it)
-            return out
+            return out.map { WebVttCue(it) }
         }
     }
+
     fun parse(inputStream: InputStream): List<WebvttCueInfo> {
         val output = object : Consumer<CuesWithTiming> {
             val contents: MutableList<CuesWithTiming> = arrayListOf()

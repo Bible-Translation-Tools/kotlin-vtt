@@ -27,7 +27,8 @@ class Cue private constructor(
      * The cue text, or null if this is an image cue. Note the [CharSequence] may be decorated
      * with styling spans.
      */
-    private var text: CharSequence? = text
+    var text: CharSequence? = text
+        private set
 
     val content: List<CharSequence> = if (markup != null) arrayListOf(*markup.toTypedArray()) else listOf()
 
