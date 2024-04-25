@@ -215,7 +215,18 @@ object VTTCueParser {
     }
 }
 
-data class WebvttCueInfo(val cue: Cue, val startTimeUs: Long, val endTimeUs: Long)
+object IdGen {
+    private var id: Int = 0
+    fun getId(): Int = id++
+}
+
+data class WebvttCueInfo(
+    val cue: Cue,
+    val startTimeUs: Long,
+    val endTimeUs: Long
+) {
+    val id: Int = IdGen.getId()
+}
 
 fun findEndOfTag(markup: String, startPos: Int): Int {
     val index: Int = markup.indexOf(CHAR_GREATER_THAN, startPos)

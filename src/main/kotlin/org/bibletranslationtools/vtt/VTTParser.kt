@@ -21,6 +21,10 @@ class VTTParser {
 
     private var parsableWebvttData: ParsableByteArray = ParsableByteArray()
 
+    fun parseDocument(file: File): WebVttDocument {
+        return WebVttDocument(file, parse(file))
+    }
+
     fun parse(file: File): List<WebVttCue> {
         file.inputStream().use {
             val out = parse(it)
@@ -94,7 +98,7 @@ class VTTParser {
             LegacySubtitleUtil.toCuesWithTiming(subtitle, outputOptions, output)
         } else {
             cueInfos
-                .map { CuesWithTiming(listOf(it.cue), it.startTimeUs, it.endTimeUs) }
+                .map { CuesWithTiming(listOf(it.cue), it.startTimeUs, it.endTimeUs - it.startTimeUs) }
                 .forEach { output.accept(it) }
         }
     }

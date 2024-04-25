@@ -29,11 +29,11 @@ private val TAG_VOICE = "v"
 
 class WebVttCue(cueInfo: WebvttCueInfo) {
 
-    private val classes = mutableMapOf<String, MutableList<String>>()
+    internal val classes = mutableMapOf<String, MutableList<String>>()
 
-    val text: String = cueInfo.cue.text.toString()
-    val startTimeUs: Long = cueInfo.startTimeUs
-    val endTimeUs: Long = cueInfo.endTimeUs
+    var text: String = cueInfo.cue.text.toString()
+    var startTimeUs: Long = cueInfo.startTimeUs
+    var endTimeUs: Long = cueInfo.endTimeUs
 
     init {
         cueInfo.cue.content.forEach {
