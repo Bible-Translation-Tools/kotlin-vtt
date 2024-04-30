@@ -43,6 +43,6 @@ class WebVttDocumentWriter(val file: File) {
 
         val microseconds = (timeUs % 1_000_000).toInt() / 1000
 
-        return "%03d:%02d:%02d:%03d".format(hours, minutes, seconds, microseconds)
+        return "%03d:%02d:%02d.%03d".format(hours, minutes, seconds, microseconds)
     }
 }
